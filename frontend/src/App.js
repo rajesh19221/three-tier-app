@@ -11,8 +11,8 @@ class App extends Tasks {
         return (
             <div className="app">
                 <header className="app-header">
-                    <h1>My To-Do List</h1>
-                </header>
+                <h1>My To-Do List v2.0 🚀</h1>
+		</header>
                 <div className="main-content">
                     <Paper elevation={3} className="todo-container">
                         <form onSubmit={this.handleSubmit} className="task-form">
