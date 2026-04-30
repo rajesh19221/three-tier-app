@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: three-tier-app-backend:latest
+          image: 59005/three-tier-app-backend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
