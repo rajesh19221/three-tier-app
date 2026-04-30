@@ -4,6 +4,7 @@ pipeline {
         DOCKERHUB_USERNAME = '59005'
         FRONTEND_IMAGE = "${DOCKERHUB_USERNAME}/three-tier-app-frontend"
         BACKEND_IMAGE = "${DOCKERHUB_USERNAME}/three-tier-app-backend"
+        KUBECONFIG = "C:\\Users\\User\\.kube\\config"
     }
     stages {
         stage('Checkout') {
@@ -38,12 +39,12 @@ pipeline {
         }
         stage('Deploy to Kubernetes') {
             steps {
-                bat "kubectl apply -f k8s/mongodb.yaml --validate=false"
-                bat "kubectl apply -f k8s/backend.yaml --validate=false"
-                bat "kubectl apply -f k8s/frontend.yaml --validate=false"
-                bat "kubectl apply -f k8s/ingress.yaml --validate=false"
-                bat "kubectl rollout restart deployment/frontend -n three-tier-app"
-                bat "kubectl rollout restart deployment/backend -n three-tier-app"
+                bat "kubectl apply -f k8s/mongodb.yaml --validate=false --kubeconfig=\"C:\\Users\\User\\.kube\\config\""
+                bat "kubectl apply -f k8s/backend.yaml --validate=false --kubeconfig=\"C:\\Users\\User\\.kube\\config\""
+                bat "kubectl apply -f k8s/frontend.yaml --validate=false --kubeconfig=\"C:\\Users\\User\\.kube\\config\""
+                bat "kubectl apply -f k8s/ingress.yaml --validate=false --kubeconfig=\"C:\\Users\\User\\.kube\\config\""
+                bat "kubectl rollout restart deployment/frontend -n three-tier-app --kubeconfig=\"C:\\Users\\User\\.kube\\config\""
+                bat "kubectl rollout restart deployment/backend -n three-tier-app --kubeconfig=\"C:\\Users\\User\\.kube\\config\""
             }
         }
     }
