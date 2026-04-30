@@ -5,6 +5,7 @@ pipeline {
         FRONTEND_IMAGE = "${DOCKERHUB_USERNAME}/three-tier-app-frontend"
         BACKEND_IMAGE = "${DOCKERHUB_USERNAME}/three-tier-app-backend"
         KUBECONFIG = "C:\\Users\\User\\.kube\\config"
+        TRIVY = "C:\\ProgramData\\chocolatey\\bin\\trivy.exe"
     }
     stages {
         stage('Checkout') {
@@ -26,12 +27,12 @@ pipeline {
         }
         stage('Trivy Scan Frontend') {
             steps {
-                bat "trivy image --exit-code 0 --severity HIGH,CRITICAL --format table %FRONTEND_IMAGE%:latest"
+                bat "\"%TRIVY%\" image --exit-code 0 --severity HIGH,CRITICAL --format table %FRONTEND_IMAGE%:latest"
             }
         }
         stage('Trivy Scan Backend') {
             steps {
-                bat "trivy image --exit-code 0 --severity HIGH,CRITICAL --format table %BACKEND_IMAGE%:latest"
+                bat "\"%TRIVY%\" image --exit-code 0 --severity HIGH,CRITICAL --format table %BACKEND_IMAGE%:latest"
             }
         }
         stage('Push to Docker Hub') {
