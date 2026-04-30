@@ -1,20 +1,25 @@
-# Use the official Node.js 14 image as a base image
+# Use official Node.js image
 FROM node:14
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
+# Copy dependency files
 COPY package*.json ./
 
-# Install the application's dependencies inside the container
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code to the container
+# Copy app source code
 COPY . .
 
-# Exposing Port to the container
+# ✅ Fix for Kubernetes (VERY IMPORTANT)
+ENV BROWSER=none
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
+# Expose port
 EXPOSE 3000
 
-# Specify the command to run when the container starts
-CMD [ "npm", "start" ]
+# Start the app
+CMD ["npm", "start"]
