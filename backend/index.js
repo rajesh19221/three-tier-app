@@ -10,7 +10,7 @@ app.get('/ok', (req, res) => {
     res.status(200).send('ok')
 });
 app.get('/api/version', (req, res) => {
-    res.json({ version: '2.0', status: 'Backend Latest!' });
+    res.json({ version: "3.0"', status: 'Backend Latest!' });
 });
 app.use("/api/tasks", tasks);
 const port = process.env.PORT || 8080;
