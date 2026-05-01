@@ -15,6 +15,13 @@ pipeline {
                     branch: 'main'
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+                    bat "C:\\sonar-scanner\\sonar-scanner-5.0.1.3006-windows\\bin\\sonar-scanner.bat -D\"sonar.projectKey=three-tier-app\" -D\"sonar.sources=.\" -D\"sonar.host.url=http://localhost:9000\" -D\"sonar.login=%SONAR_TOKEN%\""
+                }
+            }
+        }
         stage('Build Frontend') {
             steps {
                 bat "docker build -t %FRONTEND_IMAGE%:latest ./frontend"
