@@ -2,8 +2,11 @@ pipeline {
     agent any
     environment {
         DOCKERHUB_USERNAME = '59005'
-        FRONTEND_IMAGE = "${DOCKERHUB_USERNAME}/three-tier-app-frontend"
-        BACKEND_IMAGE = "${DOCKERHUB_USERNAME}/three-tier-app-backend"
+        JFROG_URL = 'trialxaz6ro.jfrog.io'
+        FRONTEND_IMAGE_DOCKERHUB = "${DOCKERHUB_USERNAME}/three-tier-app-frontend"
+        BACKEND_IMAGE_DOCKERHUB = "${DOCKERHUB_USERNAME}/three-tier-app-backend"
+        FRONTEND_IMAGE_JFROG = "${JFROG_URL}/docker-local/three-tier-app-frontend"
+        BACKEND_IMAGE_JFROG = "${JFROG_URL}/docker-local/three-tier-app-backend"
         KUBECONFIG = "C:\\Users\\User\\.kube\\config"
         TRIVY = "C:\\ProgramData\\chocolatey\\bin\\trivy.exe"
     }
@@ -24,22 +27,22 @@ pipeline {
         }
         stage('Build Frontend') {
             steps {
-                bat "docker build -t %FRONTEND_IMAGE%:latest ./frontend"
+                bat "docker build -t %FRONTEND_IMAGE_DOCKERHUB%:latest ./frontend"
             }
         }
         stage('Build Backend') {
             steps {
-                bat "docker build -t %BACKEND_IMAGE%:latest ./backend"
+                bat "docker build -t %BACKEND_IMAGE_DOCKERHUB%:latest ./backend"
             }
         }
         stage('Trivy Scan Frontend') {
             steps {
-                bat "\"%TRIVY%\" image --exit-code 0 --severity HIGH,CRITICAL --format table %FRONTEND_IMAGE%:latest"
+                bat "\"%TRIVY%\" image --exit-code 0 --severity HIGH,CRITICAL --format table %FRONTEND_IMAGE_DOCKERHUB%:latest"
             }
         }
         stage('Trivy Scan Backend') {
             steps {
-                bat "\"%TRIVY%\" image --exit-code 0 --severity HIGH,CRITICAL --format table %BACKEND_IMAGE%:latest"
+                bat "\"%TRIVY%\" image --exit-code 0 --severity HIGH,CRITICAL --format table %BACKEND_IMAGE_DOCKERHUB%:latest"
             }
         }
         stage('Push to Docker Hub') {
@@ -50,8 +53,23 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
-                    bat "docker push %FRONTEND_IMAGE%:latest"
-                    bat "docker push %BACKEND_IMAGE%:latest"
+                    bat "docker push %FRONTEND_IMAGE_DOCKERHUB%:latest"
+                    bat "docker push %BACKEND_IMAGE_DOCKERHUB%:latest"
+                }
+            }
+        }
+        stage('Push to JFrog') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'jfrog-creds',
+                    usernameVariable: 'JFROG_USER',
+                    passwordVariable: 'JFROG_PASS'
+                )]) {
+                    bat "docker login %JFROG_URL% -u %JFROG_USER% -p %JFROG_PASS%"
+                    bat "docker tag %FRONTEND_IMAGE_DOCKERHUB%:latest %FRONTEND_IMAGE_JFROG%:latest"
+                    bat "docker tag %BACKEND_IMAGE_DOCKERHUB%:latest %BACKEND_IMAGE_JFROG%:latest"
+                    bat "docker push %FRONTEND_IMAGE_JFROG%:latest"
+                    bat "docker push %BACKEND_IMAGE_JFROG%:latest"
                 }
             }
         }
